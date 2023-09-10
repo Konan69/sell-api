@@ -19,7 +19,7 @@ app.post('create-checkout-session/:product', (req,res) => {
   let mode, price_ID, line_items
 
   if(product === 'sub') {
-    price_ID = '',
+    price_ID = 'price_1NovJ6FvrMy13jtqVmvzvcCx',
     mode = 'subscription',
     line_items = [
       {
@@ -28,7 +28,7 @@ app.post('create-checkout-session/:product', (req,res) => {
     ]
 
   } else if(product === "pre"){
-    price_ID = '',
+    price_ID = 'price_1NovHTFvrMy13jtqgpeDrT6U',
     mode = 'payment',
     line_items = [
       {
@@ -39,6 +39,8 @@ app.post('create-checkout-session/:product', (req,res) => {
   } else {
     return res.sendStatus(403)
   }
+
+  const newApiKey = 
 })
 
 
