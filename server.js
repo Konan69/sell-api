@@ -15,11 +15,33 @@ const domain = 'http://localhost:1337'
 app.use(express.static('public'))
 
 //routes
+app.get("/delete", async (req, res) =>{
+  const{api_key} = req.query 
+  const doc = await db.collection('api_keys').doc(api_key).get()
+  if (!doc.exists){
+    res.status(400).send({"status": "api key does not exist"})
+  } else{
+    const {stripeCustomerId} = doc.data()
+    try {
+      const customer = await stripe.customers.retreive(
+        stripeCustomerId,
+        {expand: ['subscriptions']}
+      )
+      let subscriptionId = customer?.subscriptions?.data?.[0]?.id
+      stripe.subscriptions.del(subscriptionId)
+    } catch (err) {
+      console.log(err.msg)
+      return res.sendStatus(500)
+    }
+  res.sendStatus(200)
+  }
+})
+
 app.get('/check_status', async (req, res) => {
     const{api_key} = req.query 
     const doc = await db.collection('api_keys').doc(api_key).get()
-    if (!doc.exist){
-      res.Status(400).send({"status": "api key does not exist"})
+    if (!doc.exists){
+      res.status(400).send({"status": "api key does not exist"})
     } else{
       const {status} = doc.data('status')
     res.status(200).send({"status": status })
@@ -46,6 +68,7 @@ app.post('/create-checkout-session/:product', async (req,res) => {
         price: price_ID
       }
     ]
+    quantity_type = 'subscription'
 
   } else if(product === "pre"){
     price_ID = 'price_1NovHTFvrMy13jtqgpeDrT6U',
@@ -56,6 +79,7 @@ app.post('/create-checkout-session/:product', async (req,res) => {
         quantity:1
       }
     ]
+    quantity_type = 10
   } else {
     return res.sendStatus(403)
   }
@@ -88,11 +112,11 @@ app.post('/create-checkout-session/:product', async (req,res) => {
     APIkey:newApiKey,
     paymentType: product,
     stripeCustomerId,
-    status:null // subscription or 8
+    status: quantity_type// subscription or 8
   }
 
-  const dbRes = await db.collection('api_keys').doc(newApiKey).set(data, {merge:true})
-
+  const dbRes = await db.collection('api_keys').doc(newApiKey).set
+  (data, {merge:true})
   //use webhook to access the firebase entry for that api key and ensure
   // that billing info is iupdated
 
