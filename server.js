@@ -29,6 +29,10 @@ app.get("/delete", async (req, res) =>{
       )
       let subscriptionId = customer?.subscriptions?.data?.[0]?.id
       stripe.subscriptions.del(subscriptionId)
+      
+      const data = {
+        status: null //subscription or 8
+    }
     } catch (err) {
       console.log(err.msg)
       return res.sendStatus(500)
@@ -60,7 +64,7 @@ app.post('/create-checkout-session/:product', async (req,res) => {
   const {product} = req.params
   let mode, price_ID, line_items
 
-  if(product === 'sub') {
+  if(product === "sub") {
     price_ID = 'price_1NovJ6FvrMy13jtqVmvzvcCx',
     mode = 'subscription',
     line_items = [
@@ -112,7 +116,7 @@ app.post('/create-checkout-session/:product', async (req,res) => {
     APIkey:newApiKey,
     paymentType: product,
     stripeCustomerId,
-    status: quantity_type// subscription or 8
+    status: quantity_type // subscription or 8
   }
 
   const dbRes = await db.collection('api_keys').doc(newApiKey).set
