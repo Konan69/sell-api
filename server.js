@@ -14,6 +14,13 @@ app.use(express.static('public'))
 
 
 //routes
+app.get('/api', (req, res) => {
+  //receive api key
+  const {api_key } =req.query
+  if(!api_key) return res.sendStatus(403)
+  res.status(200).send({"message": 'you can do it i beleive in you'})
+})
+
 
 app.post('/create-checkout-session/:product', async (req,res) => {
   const {product} = req.params
