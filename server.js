@@ -1,8 +1,10 @@
 const express = require('express')
 const { generateApiKey } = require('generate-api-key')
+const { db } = require('./firebase')
 const app = express()
 const PORT = 1337
 require('dotenv').config()
+
 
 //Variabes
 STRIPE_SECRET_KEY = process.env.STRIPE_SK
@@ -11,7 +13,6 @@ const domain = 'http://localhost:1337'
 
 //middleware
 app.use(express.static('public'))
-
 
 //routes
 app.get('/api', (req, res) => {
