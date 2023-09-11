@@ -1,4 +1,5 @@
 const express = require('express')
+const { generateApiKey } = require('generate-api-key')
 const app = express()
 const PORT = 1337
 require('dotenv').config()
@@ -14,7 +15,7 @@ app.use(express.static('public'))
 
 //routes
 
-app.post('create-checkout-session/:product', (req,res) => {
+app.post('/create-checkout-session/:product', async (req,res) => {
   const {product} = req.params
   let mode, price_ID, line_items
 
@@ -40,7 +41,38 @@ app.post('create-checkout-session/:product', (req,res) => {
     return res.sendStatus(403)
   }
 
-  const newApiKey = 
+  const newApiKey = generateApiKey
+  const customer = await stripe.customers.create({
+    metadata: {
+      APIkey: newApiKey
+    }
+  })
+
+  const stripeCustomerId = customer.id
+  const session = await stripe.checkout.sessions.create({
+    customer: stripeCustomerId,
+    metadata: {
+      APIkey: newApiKey,
+      paymentType: product
+    },
+    line_items: line_items,
+    mode: mode,
+    success_url : `${domain}/success.html?api_key=${newApiKey},`,
+    cancel_url: `${domain}/cancel.html,`
+  })
+
+  console.log(session)
+
+  //create firebase record 
+
+  //use webhook to access the firebase entry for that api key and ensure
+  // that billing info is iupdated
+
+  res.redirect(303, session.url)
+})
+
+app.post('/stripe_webhook', (req, res) => {
+
 })
 
 
