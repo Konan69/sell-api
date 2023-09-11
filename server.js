@@ -15,6 +15,17 @@ const domain = 'http://localhost:1337'
 app.use(express.static('public'))
 
 //routes
+app.get('/check_status', async (req, res) => {
+    const{api_key} = req.query 
+    const doc = await db.collection('api_keys').doc(api_key).get()
+    if (!doc.exist){
+      res.Status(400).send({"status": "api key does not exist"})
+    } else{
+      const {status} = doc.data('status')
+    res.status(200).send({"status": status })
+    }
+})
+
 app.get('/api', (req, res) => {
   //receive api key
   const {api_key } =req.query
@@ -76,7 +87,8 @@ app.post('/create-checkout-session/:product', async (req,res) => {
   const data = {
     APIkey:newApiKey,
     paymentType: product,
-    stripeCustomerId 
+    stripeCustomerId,
+    status:null // subscription or 8
   }
 
   const dbRes = await db.collection('api_keys').doc(newApiKey).set(data, {merge:true})
