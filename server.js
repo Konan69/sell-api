@@ -73,6 +73,14 @@ app.post('/create-checkout-session/:product', async (req,res) => {
 
   //create firebase record 
 
+  const data = {
+    APIkey:newApiKey,
+    paymentType: product,
+    stripeCustomerId 
+  }
+
+  const dbRes = await db.collection('api_keys').doc(newApiKey).set(data, {merge:true})
+
   //use webhook to access the firebase entry for that api key and ensure
   // that billing info is iupdated
 
