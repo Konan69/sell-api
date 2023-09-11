@@ -41,7 +41,7 @@ app.post('/create-checkout-session/:product', async (req,res) => {
     return res.sendStatus(403)
   }
 
-  const newApiKey = generateApiKey
+  const newApiKey = generateApiKey()
   const customer = await stripe.customers.create({
     metadata: {
       APIkey: newApiKey
