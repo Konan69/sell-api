@@ -11,4 +11,4 @@ initializeApp({
 
 const db = getFireStore
 
-module.exports  = db
+module.exports  = {db}
