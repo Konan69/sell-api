@@ -23,7 +23,7 @@ app.get("/delete", async (req, res) =>{
   } else{
     const {stripeCustomerId} = doc.data()
     try {
-      const customer = await stripe.customers.retreive(
+      const customer = await stripe.customers.retrieve(
         stripeCustomerId,
         {expand: ['subscriptions']}
       )
