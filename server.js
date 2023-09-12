@@ -33,6 +33,9 @@ app.get("/delete", async (req, res) =>{
       const data = {
         status: null //subscription or 8
     }
+
+    const dbRes = await db.collection('api_keys').doc(newApiKey).set
+    (data, {merge:true})
     } catch (err) {
       console.log(err.msg)
       return res.sendStatus(500)
@@ -52,11 +55,34 @@ app.get('/check_status', async (req, res) => {
     }
 })
 
-app.get('/api', (req, res) => {
+app.get('/api', async (req, res) => {
   //receive api key
   const {api_key } =req.query
   if(!api_key) return res.sendStatus(403)
-  res.status(200).send({"message": 'you can do it i beleive in you'})
+  let paid_status, type
+  const doc = await db.collection('api_keys').doc(api_key).get()
+  if (!doc.exists){
+    res.status(403).send({"status": "api key does not exist"})  
+  } else{
+    const {status, type } = doc.data()
+    if (status === 'subscription'){
+      paid_status = true
+    }else if (status > 0){
+      paid_status = true
+    }
+    const data = {
+      status: status -1  //subscription or 8
+  }
+
+  const dbRes = await db.collection('api_keys').doc(newApiKey).set
+  (data, {merge:true})
+  }
+  if (paid_status){
+      res.status(200).send({"message": 'you can do it i beleive in you'})
+  } else {
+    res.sendStatus(403)
+  }
+
 })
 
 
