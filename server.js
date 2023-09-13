@@ -34,7 +34,7 @@ app.get("/delete", async (req, res) =>{
         status: null //subscription or 8
     }
 
-    const dbRes = await db.collection('api_keys').doc(newApiKey).set
+    const dbRes = await db.collection('api_keys').doc(api_key).set
     (data, {merge:true})
     } catch (err) {
       console.log(err.msg)
@@ -67,6 +67,22 @@ app.get('/api', async (req, res) => {
     const {status, type } = doc.data()
     if (status === 'subscription'){
       paid_status = true
+      const customer = await stripe.customers.retrieve(
+        stripeCustomerId,
+        {expand: ['subscriptions']}
+      )
+      let subscriptionId = customer?.subscriptions?.data?.[0]?.id
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      const itemId = subscription?.items?.data[0].id
+
+      const record = stripe.subscriptionItems.createUsageRecord(
+        itemId, {
+          quantity: 1,
+          timestamp: 'now',
+          action: 'increment'
+            }
+          )
+      console.log('record created')
     }else if (status > 0){
       paid_status = true
     }
@@ -74,7 +90,7 @@ app.get('/api', async (req, res) => {
       status: status -1  //subscription or 8
   }
 
-  const dbRes = await db.collection('api_keys').doc(newApiKey).set
+  const dbRes = await db.collection('api_keys').doc(api_key).set
   (data, {merge:true})
   }
   if (paid_status){

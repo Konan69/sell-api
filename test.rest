@@ -1,0 +1,5 @@
+###
+ GET http://localhost:1337/api?api_key=_0NEMgYi1e.HTG2cszpJxkhO.IV
+
+###
+ GET http://localhost:1337/api?api_key=yuSwIsfs0~gChwP~a4RxibWx28T0
